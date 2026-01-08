@@ -1,0 +1,18 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import "tailwindcss";
+
+button {
+  @apply cursor-pointer;
+}
+
+@keyframes timer-shrink {
+  from { width: 100%; }
+  to { width: 0; }
+}
+
+.animate-timer {
+  animation-name: timer-shrink;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}

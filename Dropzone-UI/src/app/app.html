@@ -1,0 +1,7 @@
+<div class="fixed bottom-5 right-5 z-50 flex flex-col items-end">
+  @for (toast of toasts$ | async; track toast.id) {
+    <app-toast class="block mb-4" [toast]="toast"></app-toast>
+  }
+</div>
+<app-confirm-modal></app-confirm-modal>
+<router-outlet></router-outlet>

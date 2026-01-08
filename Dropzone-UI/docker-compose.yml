@@ -1,0 +1,8 @@
+services:
+  ui:
+    container_name: dropzone-ui
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4200:80"

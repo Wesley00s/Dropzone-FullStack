@@ -1,0 +1,67 @@
+<div
+  class="relative flex items-center w-full max-w-xs p-4 rounded-lg shadow-xl overflow-hidden mb-3
+          transition-all duration-300 ease-out transform"
+  [class.translate-x-0]="isVisible()"
+  [class.opacity-100]="isVisible()"
+  [class.translate-x-full]="!isVisible()"
+  [class.opacity-0]="!isVisible()"
+  [ngClass]="{
+      'bg-green-100 text-green-700 border border-green-200': toast().type === 'success',
+      'bg-red-100 text-red-700 border border-red-200': toast().type === 'error',
+      'bg-blue-100 text-blue-700 border border-blue-200': toast().type === 'info',
+      'bg-yellow-100 text-yellow-700 border border-yellow-200': toast().type === 'warning'
+   }"
+>
+  @switch (toast().type) {
+    @case ("success") {
+      <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 rounded-lg bg-green-200 text-green-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+      </div>
+    }
+    @case ("error") {
+      <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 rounded-lg bg-red-200 text-red-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </div>
+    }
+    @case ("info") {
+      <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 rounded-lg bg-blue-200 text-blue-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      </div>
+    }
+    @case ("warning") {
+      <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 rounded-lg bg-yellow-200 text-yellow-700">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+      </div>
+    }
+  }
+
+  <div class="ml-3 text-sm font-normal flex-1">{{ toast().message }}</div>
+
+  <button
+    type="button"
+    class="ml-auto -mx-1.5 -my-1.5 rounded-lg focus:ring-2 p-1.5 inline-flex h-8 w-8 transition-colors"
+    (click)="toastClose()"
+    [class]="{
+         'hover:bg-green-200 focus:ring-green-400': toast().type === 'success',
+         'hover:bg-red-200 focus:ring-red-400': toast().type === 'error',
+         'hover:bg-blue-200 focus:ring-blue-400': toast().type === 'info',
+         'hover:bg-yellow-200 focus:ring-yellow-400': toast().type === 'warning'
+      }"
+  >
+    <span class="sr-only">Fechar</span>
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+    </svg>
+  </button>
+
+  <div
+    class="absolute bottom-0 left-0 h-1 animate-timer opacity-50"
+    [style.animation-duration]="(toast().duration || 3000) + 'ms'"
+    [ngClass]="{
+         'bg-green-600': toast().type === 'success',
+         'bg-red-600': toast().type === 'error',
+         'bg-blue-600': toast().type === 'info',
+         'bg-yellow-600': toast().type === 'warning'
+      }"
+  ></div>
+</div>

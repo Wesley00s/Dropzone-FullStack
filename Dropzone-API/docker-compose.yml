@@ -1,0 +1,87 @@
+services:
+  localstack:
+    container_name: "dropzone_localstack"
+    image: localstack/localstack
+    ports:
+      - "4566:4566"
+    env_file:
+      - .env
+    volumes:
+      - "./localstack_data:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:4566/_localstack/health" ]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    networks:
+      - dropzone-net
+
+  terraform-init:
+    image: hashicorp/terraform:1.9
+    container_name: dropzone_terraform_init
+    volumes:
+      - ./infra:/infra
+    working_dir: /infra
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_EC2_METADATA_DISABLED=${AWS_EC2_METADATA_DISABLED}
+      - AWS_SKIP_CREDENTIALS_VALIDATION=${AWS_SKIP_CREDENTIALS_VALIDATION}
+      - AWS_SKIP_METADATA_API_CHECK=${AWS_SKIP_METADATA_API_CHECK}
+      - AWS_S3_FORCE_PATH_STYLE=${AWS_S3_FORCE_PATH_STYLE}
+    entrypoint: [ "/bin/sh", "-c" ]
+    command: >-
+      "rm -rf .terraform .terraform.lock.hcl terraform.tfstate* &&
+       terraform init &&
+       terraform apply -auto-approve -var='aws_endpoint=http://localstack:4566'"
+    depends_on:
+      localstack:
+        condition: service_healthy
+    networks:
+      - dropzone-net
+
+  app:
+    container_name: dropzone-api
+    build:
+      context: .
+    image: wesley00s/dropzone-api:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+      terraform-init:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    networks:
+      - dropzone-net
+
+  db:
+    image: postgres:18-alpine
+    container_name: dropzone-pg
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dropzone-net
+
+volumes:
+  postgres_data:
+
+networks:
+  dropzone-net:
+    driver: bridge

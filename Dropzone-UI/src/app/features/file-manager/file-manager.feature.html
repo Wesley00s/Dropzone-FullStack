@@ -1,0 +1,206 @@
+<div class="min-h-screen bg-slate-50 py-10 px-4 sm:px-6">
+  <div class="max-w-5xl mx-auto space-y-8">
+
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold tracking-tight text-slate-900">Meus Arquivos</h1>
+        <p class="text-slate-500 text-sm mt-1">Gerencie seus documentos e mídias.</p>
+      </div>
+      <div class="hidden sm:block text-right">
+        <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Armazenamento em Uso</span>
+        <div class="flex items-baseline justify-end gap-2">
+          <p class="text-xl font-medium text-slate-900">
+            {{ pagination.totalSize | fileSize }}
+          </p>
+          <span class="text-sm text-slate-500">
+             ({{ pagination.totalElements }} arquivo{{ pagination.totalElements === 1 ? '' : 's' }} )
+           </span>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="relative group w-full h-48"
+      (drop)="onDrop($event)"
+      (dragover)="onDragOver($event)"
+      (dragenter)="onDragEnter($event)"
+      (dragleave)="onDragLeave($event)"
+    >
+      <label
+        class="flex flex-col items-center justify-center w-full h-full border-2 border-dashed rounded-xl cursor-pointer transition-all duration-300 ease-in-out absolute inset-0 z-10 bg-white border-slate-300 hover:border-blue-400 hover:bg-slate-50"
+        [class.opacity-0]="isDragging()"
+      >
+        <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center pointer-events-none">
+          @if (isLoading) {
+            <svg class="animate-spin h-8 w-8 text-blue-500 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="text-sm text-blue-600 font-medium">Enviando arquivos...</p>
+          } @else {
+            <div class="p-3 bg-slate-100 rounded-full mb-3 group-hover:bg-blue-100 transition-colors">
+              <svg class="w-6 h-6 text-slate-500 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+              </svg>
+            </div>
+            <p class="text-sm text-slate-600"><span class="font-semibold text-blue-600">Clique para enviar</span> ou arraste e solte</p>
+            <p class="text-xs text-slate-400 mt-1">Múltiplos arquivos (até 1GB)</p>
+          }
+        </div>
+
+        <input
+          type="file"
+          class="hidden"
+          (change)="onFileSelected($event)"
+          [disabled]="isLoading"
+          multiple
+        />
+      </label>
+
+      <div
+        class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-emerald-50 border-2 border-emerald-500 border-dashed rounded-xl transition-all duration-200 pointer-events-none"
+        [class.opacity-100]="isDragging()"
+        [class.opacity-0]="!isDragging()"
+        [class.scale-100]="isDragging()"
+        [class.scale-95]="!isDragging()"
+      >
+        <svg class="w-12 h-12 text-emerald-500 mb-3 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        <p class="text-lg text-emerald-700 font-bold">Solte os arquivos aqui!</p>
+      </div>
+    </div>
+
+    <div class="bg-white shadow-sm ring-1 ring-slate-900/5 rounded-xl overflow-hidden">
+
+      @if (files.length > 0) {
+        <div class="grid grid-cols-12 gap-4 px-6 py-3 bg-slate-50/50 border-b border-slate-100 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <div class="col-span-6 sm:col-span-5">Nome</div>
+          <div class="col-span-3 hidden sm:block">Detalhes</div>
+          <div class="col-span-4 sm:col-span-3 hidden sm:block">Data</div>
+          <div class="col-span-6 sm:col-span-1 text-right">Ações</div>
+        </div>
+      }
+
+      <ul class="divide-y divide-slate-100">
+        @for (file of files; track file.id) {
+          @let typeInfo = getFileTypeInfo(file.contentType);
+
+          <li class="group hover:bg-slate-50 transition-colors duration-150">
+            <div class="grid grid-cols-12 gap-4 px-6 py-4 items-center">
+
+              <div class="col-span-8 sm:col-span-5 flex items-center gap-4">
+                <div class="shrink-0 w-10 h-10 rounded-lg flex items-center justify-center" [ngClass]="typeInfo.colorClass">
+                  @switch (typeInfo.icon) {
+                    @case ('image') {
+                      <img src="assets/icons/image-icon.svg" alt="Image Icon" class="w-5 h-5">
+                    }
+                    @case ('pdf') {
+                      <img src="assets/icons/pdf-icon.svg" alt="Image Icon" class="w-5 h-5">
+                    }
+                    @case ('code') {
+                      <img src="assets/icons/code-icon.svg" alt="Image Icon" class="w-5 h-5">
+                    }
+                    @case ('android') {
+                      <img src="assets/icons/android-icon.svg" alt="Image Icon" class="w-5 h-5">
+                    }
+                    @case ('archive') {
+                      <img src="assets/icons/archive-icon.svg" alt="Image Icon" class="w-5 h-5">
+                    }
+                    @case ('doc') {
+                      <img src="assets/icons/doc-icon.svg" alt="Image Icon" class="w-5 h-5">
+                    }
+                    @case ('sheet') {
+                      <img src="assets/icons/sheet-icon.svg" alt="Image Icon" class="w-5 h-5">
+                    }
+                    @case ('video') {
+                      <img src="assets/icons/video-icon.svg" alt="Image Icon" class="w-5 h-5">
+                    }
+                    @case ('audio') {
+                      <img src="assets/icons/audio-icon.svg" alt="Image Icon" class="w-5 h-5">
+                    }
+                    @default {
+                      <img src="assets/icons/default-icon.svg" alt="Image Icon" class="w-5 h-5">
+                    }
+                  }
+                </div>
+                <div class="min-w-0">
+                  <p class="text-sm font-medium text-slate-900 truncate" title="{{file.originalName}}">
+                    {{ file.originalName }}
+                  </p>
+                  <div class="sm:hidden flex items-center gap-2 mt-1">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800">
+                      {{ file.size | fileSize }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hidden sm:block col-span-3">
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border border-slate-200 bg-white text-slate-600">
+                    {{ typeInfo.label }}
+                  </span>
+                  <span class="text-sm text-slate-500">{{ file.size | fileSize }}</span>
+                </div>
+              </div>
+
+              <div class="hidden sm:block col-span-3">
+                <span class="text-sm text-slate-500">{{ file.createdAt | date:'dd MMM yyyy, HH:mm' }}</span>
+              </div>
+
+              <div class="col-span-4 sm:col-span-1 flex justify-end gap-2">
+                <button
+                  (click)="onDownload(file.id)"
+                  class="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors group-hover:text-slate-600"
+                  title="Download"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                </button>
+                <button
+                  (click)="onDelete(file.id)"
+                  class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors group-hover:text-slate-600"
+                  title="Excluir"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+              </div>
+            </div>
+          </li>
+        } @empty {
+          <li class="flex flex-col items-center justify-center py-16 text-slate-500">
+            <div class="bg-slate-50 p-4 rounded-full mb-4">
+              <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+            </div>
+            <p class="font-medium text-slate-900">Nenhum arquivo encontrado</p>
+            <p class="text-sm mt-1">Faça upload de um arquivo para começar.</p>
+          </li>
+        }
+      </ul>
+
+      @if (pagination.totalElements > 0) {
+        <div class="px-6 py-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/50">
+          <p class="text-sm text-slate-500">
+            Página <span class="font-medium text-slate-900">{{ pagination.page + 1 }}</span> de <span class="font-medium">{{ pagination.totalPages }}</span>
+          </p>
+
+          <div class="flex gap-2">
+            <button
+              [disabled]="pagination.page === 0"
+              (click)="onPageChange(currentPage - 1)"
+              class="px-3 py-1.5 text-sm font-medium rounded-md border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Anterior
+            </button>
+            <button
+              [disabled]="currentPage >= pagination.totalPages - 1"
+              (click)="onPageChange(currentPage + 1)"
+              class="px-3 py-1.5 text-sm font-medium rounded-md border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Próxima
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+  </div>
+</div>
