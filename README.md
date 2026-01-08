@@ -4,7 +4,7 @@ Dropzone is a complete file management solution that features drag & drop upload
 
 ## 🚀 Tech Stack
 
-### Backend (`dropzone-api`)
+### Backend (`Dropzone-API`)
 - **Language:** Java 21
 - **Framework:** Spring Boot 3+
 - **Build Tool:** Gradle 8+
