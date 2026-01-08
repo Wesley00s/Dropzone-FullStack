@@ -65,15 +65,15 @@ This method spins up the entire stack: Database, LocalStack (S3), Backend API, F
    ```bash
    git clone https://github.com/Wesley00s/Dropzone-FullStack.git
    cd Dropzone-FullStack
-
-   # Terraform Infrastructure Variables
-   cp Dropzone-API/infra/terraform.tfvars.example Dropzone-API/infra/terraform.tfvars
    ```
 
 2. **Configure environment variables:**
    Copy the example file. The default values work out-of-the-box for Docker.
    ```bash
    cp .env.example .env
+
+   # Terraform Infrastructure Variables
+   cp Dropzone-API/infra/terraform.tfvars.example Dropzone-API/infra/terraform.tfvars
    ```
 
 3. **Start the containers:**
