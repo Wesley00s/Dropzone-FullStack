@@ -67,7 +67,7 @@ This method spins up the entire stack: Database, LocalStack (S3), Backend API, F
    cd Dropzone-FullStack
 
    # Terraform Infrastructure Variables
-    cp Dropzone-API/infra/terraform.tfvars.example Dropzone-API/infra/terraform.tfvars
+   cp Dropzone-API/infra/terraform.tfvars.example Dropzone-API/infra/terraform.tfvars
    ```
 
 2. **Configure environment variables:**
