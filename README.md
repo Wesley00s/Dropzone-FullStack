@@ -14,7 +14,7 @@ Dropzone is a complete file management solution that features drag & drop upload
 
 ### Frontend (`Dropzone-UI`)
 - **Framework:** Angular 17+ (Standalone Components)
-- **Styling:** Tailwind CSS (Modern Dark Mode)
+- **Styling:** Tailwind CSS
 - **Web Server:** Nginx (for production/docker)
 - **Language:** TypeScript
 
