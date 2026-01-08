@@ -34,7 +34,7 @@ The project is organized as a monorepo containing both backend and frontend:
 Dropzone-FullStack/
 ├── docker-compose.yml       # Orchestration of all services (App, UI, DB, AWS Mock)
 ├── .env                     # Centralized environment variables
-├── dropzone-api/            # Spring Boot RESTful API
+├── Dropzone-API/            # Spring Boot RESTful API
 │   ├── src/                 # Java source code
 │   └── infra/               # Terraform scripts to provision S3
 └── Dropzone-UI/             # Angular SPA Application
